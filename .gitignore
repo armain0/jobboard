@@ -19,7 +19,7 @@ target/
 *.iml
 *.ipr
 
-
+https://github.com
 src/main/resources/application.properties
 
 ### NetBeans ###
