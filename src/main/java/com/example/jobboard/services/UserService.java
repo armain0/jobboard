@@ -1,4 +1,9 @@
 package com.example.jobboard.services;
 
-public class UserService {
+import com.example.jobboard.domain.entities.UserEntity;
+
+public interface UserService {
+
+    UserEntity register(UserEntity userEntity);
+
 }
