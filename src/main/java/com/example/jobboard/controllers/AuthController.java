@@ -1,8 +1,9 @@
 package com.example.jobboard.controllers;
 
-import com.example.jobboard.domain.dto.UserDto;
-import com.example.jobboard.domain.entities.UserEntity;
-import com.example.jobboard.mappers.impl.UserMapper;
+import com.example.jobboard.domain.dto.ApplicantDto;
+import com.example.jobboard.domain.dto.ApplicantResponseDto;
+import com.example.jobboard.domain.dto.EmployerDto;
+import com.example.jobboard.domain.dto.EmployerResponseDto;
 import com.example.jobboard.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,20 +14,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class AuthController {
 
-    private final UserMapper userMapper;
     private final UserService userService;
 
-    public AuthController(UserMapper userMapper, UserService userService) {
-        this.userMapper = userMapper;
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> Register(@RequestBody UserDto userDto) {
-        UserEntity userEntity = userMapper.mapFrom(userDto);
-        UserEntity savedUserEntity = userService.register(userEntity);
+    @PostMapping("/register/employer")
+    public ResponseEntity<EmployerResponseDto> RegisterEmployer(@RequestBody EmployerDto employerDto) {
+        EmployerResponseDto employerResponseDto = userService.registerEmployer(employerDto);
 
-        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
+        return new ResponseEntity<>(employerResponseDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/register/applicant")
+    public ResponseEntity<ApplicantResponseDto> RegisterApplicant(@RequestBody ApplicantDto applicantDto) {
+        ApplicantResponseDto applicantResponseDto = userService.registerApplicant(applicantDto);
+
+        return new ResponseEntity<>(applicantResponseDto, HttpStatus.CREATED);
     }
 
 }

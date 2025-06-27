@@ -30,7 +30,4 @@ public class CompanyEntity {
 
     private String industry;
 
-//    @OneToMany(mappedBy = "company")
-//    private List<EmployerEntity> employers;
-
 }

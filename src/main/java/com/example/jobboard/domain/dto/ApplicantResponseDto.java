@@ -1,0 +1,19 @@
+package com.example.jobboard.domain.dto;
+
+import com.example.jobboard.domain.Role;
+
+public class ApplicantResponseDto {
+
+    private Long id;
+
+    private String name;
+
+    private String username;
+
+    private Integer age;
+
+    private Role role;
+
+    private String resume;
+
+}
