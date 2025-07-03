@@ -1,7 +1,15 @@
 package com.example.jobboard.domain.dto;
 
 import com.example.jobboard.domain.Role;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ApplicantResponseDto {
 
     private Long id;

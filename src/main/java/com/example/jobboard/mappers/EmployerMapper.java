@@ -4,12 +4,9 @@ import com.example.jobboard.domain.dto.EmployerDto;
 import com.example.jobboard.domain.dto.EmployerResponseDto;
 import com.example.jobboard.domain.entities.EmployerEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring", uses = CompanyMapper.class)
 public interface EmployerMapper {
-
-    EmployerMapper INSTANCE = Mappers.getMapper(EmployerMapper.class);
 
     EmployerEntity employerDtoToEmployer(EmployerDto employerDto);
 

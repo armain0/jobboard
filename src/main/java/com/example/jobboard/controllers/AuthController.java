@@ -6,6 +6,7 @@ import com.example.jobboard.domain.dto.EmployerDto;
 import com.example.jobboard.domain.dto.EmployerResponseDto;
 import com.example.jobboard.services.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,14 +21,14 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/register/employer")
+    @PostMapping(value = "/register/employer", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployerResponseDto> RegisterEmployer(@RequestBody EmployerDto employerDto) {
         EmployerResponseDto employerResponseDto = userService.registerEmployer(employerDto);
 
         return new ResponseEntity<>(employerResponseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/register/applicant")
+    @PostMapping(value = "/register/applicant", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApplicantResponseDto> RegisterApplicant(@RequestBody ApplicantDto applicantDto) {
         ApplicantResponseDto applicantResponseDto = userService.registerApplicant(applicantDto);
 
