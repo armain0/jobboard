@@ -1,5 +1,6 @@
 package com.example.jobboard.services.impl;
 
+import com.example.jobboard.domain.Role;
 import com.example.jobboard.domain.dto.*;
 import com.example.jobboard.domain.entities.ApplicantEntity;
 import com.example.jobboard.domain.entities.CompanyEntity;
@@ -12,6 +13,7 @@ import com.example.jobboard.repositories.CompanyRepository;
 import com.example.jobboard.repositories.EmployerRepository;
 import com.example.jobboard.services.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public EmployerResponseDto registerEmployer(EmployerDto employerDto) {
         CompanyDto companyDto = employerDto.getCompany();
 
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
         EmployerEntity employerEntity = employerMapper.employerDtoToEmployer(employerDto);
 
         employerEntity.setCompany(savedCompany);
+        employerEntity.setRole(Role.EMPLOYER);
 
         EmployerEntity savedEmployerEntity = employerRepository.save(employerEntity);
 
@@ -66,6 +70,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApplicantResponseDto registerApplicant(ApplicantDto applicantDto) {
         ApplicantEntity applicantEntity = applicantMapper.applicantDtoToApplicant(applicantDto);
+
+        applicantEntity.setRole(Role.APPLICANT);
 
         ApplicantEntity savedApplicantEntity = applicantRepository.save(applicantEntity);
 
