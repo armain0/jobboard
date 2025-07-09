@@ -21,6 +21,7 @@ target/
 
 https://github.com
 src/main/resources/application.properties
+src/main/resources/certs/*
 
 ### NetBeans ###
 /nbproject/private/

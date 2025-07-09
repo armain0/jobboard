@@ -1,4 +1,4 @@
-package com.example.jobboard.services.impl;
+package com.example.jobboard.services;
 
 import com.example.jobboard.domain.entities.UserEntity;
 import com.example.jobboard.repositories.UserRepository;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class AuthUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public AuthUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
