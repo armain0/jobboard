@@ -12,6 +12,7 @@ import com.example.jobboard.repositories.ApplicantRepository;
 import com.example.jobboard.repositories.CompanyRepository;
 import com.example.jobboard.repositories.EmployerRepository;
 import com.example.jobboard.services.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +30,16 @@ public class UserServiceImpl implements UserService {
     private final CompanyMapper companyMapper;
     private final CompanyRepository companyRepository;
 
-    public UserServiceImpl(EmployerRepository employerRepository, ApplicantRepository applicantRepository, EmployerMapper employerMapper, CompanyMapper companyMapper, ApplicantMapper applicantMapper, CompanyRepository companyRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(EmployerRepository employerRepository, ApplicantRepository applicantRepository, EmployerMapper employerMapper, CompanyMapper companyMapper, ApplicantMapper applicantMapper, CompanyRepository companyRepository, PasswordEncoder passwordEncoder) {
         this.employerRepository = employerRepository;
         this.applicantRepository = applicantRepository;
         this.companyRepository = companyRepository;
         this.employerMapper = employerMapper;
         this.companyMapper = companyMapper;
         this.applicantMapper = applicantMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -55,8 +59,11 @@ public class UserServiceImpl implements UserService {
             savedCompany = newCompany.get();
         }
 
+        String hashedPassword = passwordEncoder.encode(employerDto.getPassword());
+
         EmployerEntity employerEntity = employerMapper.employerDtoToEmployer(employerDto);
 
+        employerEntity.setPassword(hashedPassword);
         employerEntity.setCompany(savedCompany);
         employerEntity.setRole(Role.EMPLOYER);
 
@@ -69,8 +76,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicantResponseDto registerApplicant(ApplicantDto applicantDto) {
+        String hashedPassword = passwordEncoder.encode(applicantDto.getPassword());
+
         ApplicantEntity applicantEntity = applicantMapper.applicantDtoToApplicant(applicantDto);
 
+        applicantEntity.setPassword(hashedPassword);
         applicantEntity.setRole(Role.APPLICANT);
 
         ApplicantEntity savedApplicantEntity = applicantRepository.save(applicantEntity);

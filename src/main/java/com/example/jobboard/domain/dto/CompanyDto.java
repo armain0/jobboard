@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CompanyDto {
 
     @NotBlank(message = "Company name is required.")
-    @Size(max = 255, message = "Company name cannot exceed 255 characters.")
+    @Size(max = 255, message = "Company name cannot exceed 255 character.")
     private String name;
 
     @NotBlank(message = "Website is required.")
