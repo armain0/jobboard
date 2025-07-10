@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmployerResponseDto {
 
-    private Long id;
-
     private String name;
 
     private String username;

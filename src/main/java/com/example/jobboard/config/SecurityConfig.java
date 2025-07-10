@@ -11,7 +11,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -41,11 +44,22 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        byte[] decodedKey = Base64.getDecoder().decode(jwtKey);
+        byte[] bytes = Base64.getDecoder().decode(jwtKey);
 
-        SecretKeySpec secretKey = new SecretKeySpec(decodedKey, "HmacSHA512");
+        SecretKeySpec secretKey = new SecretKeySpec(bytes, "HmacSHA512");
 
         return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        byte[] bytes = Base64.getDecoder().decode(jwtKey);
+
+        SecretKeySpec originalKey = new SecretKeySpec(bytes, "HmacSHA512");
+
+        return NimbusJwtDecoder.withSecretKey(originalKey)
+                .macAlgorithm(MacAlgorithm.HS512)
+                .build();
     }
 
     @Bean
@@ -68,6 +82,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login/**").permitAll()
                         .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/hello").hasRole("APPLICANT")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

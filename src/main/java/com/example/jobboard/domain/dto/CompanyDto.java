@@ -19,7 +19,7 @@ public class CompanyDto {
     private String name;
 
     @NotBlank(message = "Website is required.")
-    @Pattern(regexp = "^[a-zA-Z0-9-]{1,25}\\.[a-zA-Z]{2,3}$", message = "Invalid website format. Must be like 'example.com' (max 25 chars before dot, 2-3 letters after).")
+    @Pattern(regexp = "^www\\.[a-zA-Z0-9-]{1,25}\\.[a-zA-Z]{2,3}$", message = "Invalid website format. Must be like 'example.com' (max 25 chars before dot, 2-3 letters after).")
     private String website;
 
     @NotBlank(message = "Industry is required.")
