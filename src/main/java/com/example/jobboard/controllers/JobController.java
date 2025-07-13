@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class JobController {
             String authorityString = authority.getAuthority();
 
             if ("ROLE_EMPLOYER".equals(authorityString)) {
-                List<JobDto> jobs = jobService.getAllJobsWithEmployer(authentication.getName());
+                List<JobDto> jobs = jobService.getAllJobsAsEmployer(authentication.getName());
 
                 return new ResponseEntity<>(jobs, HttpStatus.OK);
             } else if ("ROLE_APPLICANT".equals(authorityString)) {
@@ -46,7 +47,7 @@ public class JobController {
     }
 
     @PostMapping("/jobs")
-    private ResponseEntity<JobDto> postJob(Authentication authentication) {
+    private ResponseEntity<JobDto> postJob(Authentication authentication, @RequestBody JobDto job) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -55,9 +56,11 @@ public class JobController {
             String authorityString = authority.getAuthority();
 
             if (authorityString.equals("ROLE_EMPLOYER")) {
-                JobDto savedJob = jobService.saveJob(authentication.getName());
+                JobDto savedJob = jobService.saveJob(authentication.getName(), job);
 
-                return new ResponseEntity<>(savedJob, HttpStatus.CREATED);
+                if (savedJob != null) {
+                    return new ResponseEntity<>(savedJob, HttpStatus.CREATED);
+                }
             }
         }
 

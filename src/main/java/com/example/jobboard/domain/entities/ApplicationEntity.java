@@ -1,5 +1,6 @@
 package com.example.jobboard.domain.entities;
 
+import com.example.jobboard.domain.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,8 @@ public class ApplicationEntity {
     @JoinColumn(name = "job_id")
     private JobEntity job;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
 
     private LocalDateTime applicationDate;
 

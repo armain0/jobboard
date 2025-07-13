@@ -7,7 +7,7 @@ import java.util.List;
 public interface JobService {
     List<JobDto> getAllJobs();
 
-    List<JobDto> getAllJobsWithEmployer(String name);
+    List<JobDto> getAllJobsAsEmployer(String name);
 
-    JobDto saveJob(String employerUsername);
+    JobDto saveJob(String employerUsername, JobDto job);
 }

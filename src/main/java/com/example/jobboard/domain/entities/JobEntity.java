@@ -1,5 +1,6 @@
 package com.example.jobboard.domain.entities;
 
+import com.example.jobboard.domain.JobStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,12 @@ public class JobEntity {
     )
     private Long id;
 
-    @OneToOne
+    private String title;
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
+
+    @ManyToOne
     @JoinColumn(name = "employer_id")
     private EmployerEntity employer;
 

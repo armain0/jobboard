@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface JobRepository extends CrudRepository<JobEntity, Long> {
+
     List<JobEntity> findByEmployer(EmployerEntity employer);
+
 }

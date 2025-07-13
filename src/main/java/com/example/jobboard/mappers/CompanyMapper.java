@@ -7,8 +7,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface CompanyMapper {
 
-    CompanyEntity companyDtoToCompany(CompanyDto companyDto);
+    CompanyEntity toEntity(CompanyDto companyDto);
 
-    CompanyDto companyToCompanyDto(CompanyEntity companyEntity);
+    CompanyDto toDto(CompanyEntity companyEntity);
 
 }

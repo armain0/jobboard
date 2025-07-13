@@ -8,12 +8,12 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = CompanyMapper.class)
 public interface EmployerMapper {
 
-    EmployerEntity employerDtoToEmployer(EmployerDto employerDto);
+    EmployerEntity toEntity(EmployerDto employerDto);
 
-    EmployerDto employerToEmployerDto(EmployerEntity employerEntity);
+    EmployerDto toDto(EmployerEntity employerEntity);
 
-    EmployerResponseDto employerToResponse(EmployerEntity employerEntity);
+    EmployerResponseDto toResponseDto(EmployerEntity employerEntity);
 
-    EmployerEntity employerResponseToEmployer(EmployerResponseDto employerResponseDto);
+    EmployerEntity toEntity(EmployerResponseDto employerResponseDto);
 
 }

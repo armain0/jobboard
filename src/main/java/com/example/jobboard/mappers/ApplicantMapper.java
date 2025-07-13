@@ -8,12 +8,12 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ApplicantMapper {
 
-    ApplicantEntity applicantDtoToApplicant(ApplicantDto applicantDto);
+    ApplicantEntity toEntity(ApplicantDto applicantDto);
 
-    ApplicantDto applicantToApplicantDto(ApplicantEntity applicantEntity);
+    ApplicantDto toDto(ApplicantEntity applicantEntity);
 
-    ApplicantResponseDto applicantToResponse(ApplicantEntity applicantEntity);
+    ApplicantResponseDto toResponseDto(ApplicantEntity applicantEntity);
 
-    ApplicantEntity applicantResponseToApplicant(ApplicantResponseDto applicantResponseDto);
+    ApplicantEntity toResponseEntity(ApplicantResponseDto applicantResponseDto);
 
 }

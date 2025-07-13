@@ -1,5 +1,6 @@
 package com.example.jobboard.services.impl;
 
+import com.example.jobboard.domain.JobStatus;
 import com.example.jobboard.domain.dto.JobDto;
 import com.example.jobboard.domain.entities.EmployerEntity;
 import com.example.jobboard.domain.entities.JobEntity;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -35,35 +37,41 @@ public class JobServiceImpl implements JobService {
                         .spliterator(), false).toList();
 
         return jobEntities.stream()
-                .map(jobMapper::jobToJobDto)
+                .map(jobMapper::toDto)
                 .toList();
     }
 
     @Override
-    public List<JobDto> getAllJobsWithEmployer(String username) {
-        EmployerEntity employer = employerRepository.findByUsername(username);
+    public List<JobDto> getAllJobsAsEmployer(String username) {
+        Optional<EmployerEntity> employer = employerRepository.findByUsername(username);
 
-        if (employer == null) {
+        if (employer.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<JobEntity> jobEntities = jobRepository
-                .findByEmployer(employer);
+                .findByEmployer(employer.orElse(null));
 
         return jobEntities.stream()
-                .map(jobMapper::jobToJobDto)
+                .map(jobMapper::toDto)
                 .toList();
     }
 
     @Override
-    public JobDto saveJob(String employerUsername) {
-        EmployerEntity employer = employerRepository.findByUsername(employerUsername);
+    public JobDto saveJob(String employerUsername, JobDto jobDto) {
+        Optional<EmployerEntity> employer = employerRepository.findByUsername(employerUsername);
+
+        if (employer.isEmpty()) {
+            return null;
+        }
 
         JobEntity job = new JobEntity();
-        job.setEmployer(employer);
+        job.setEmployer(employer.get());
+        job.setStatus(JobStatus.OPEN);
+        job.setTitle(jobDto.getTitle());
 
         JobEntity savedJob = jobRepository.save(job);
 
-        return jobMapper.jobToJobDto(savedJob);
+        return jobMapper.toDto(savedJob);
     }
 }

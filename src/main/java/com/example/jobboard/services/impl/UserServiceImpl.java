@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         CompanyEntity savedCompany;
 
         if (newCompany.isEmpty()) {
-            CompanyEntity company = companyMapper.companyDtoToCompany(companyDto);
+            CompanyEntity company = companyMapper.toEntity(companyDto);
 
             savedCompany = companyRepository.save(company);
         } else {
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
         String hashedPassword = passwordEncoder.encode(employerDto.getPassword());
 
-        EmployerEntity employerEntity = employerMapper.employerDtoToEmployer(employerDto);
+        EmployerEntity employerEntity = employerMapper.toEntity(employerDto);
 
         employerEntity.setPassword(hashedPassword);
         employerEntity.setCompany(savedCompany);
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
         EmployerEntity savedEmployerEntity = employerRepository.save(employerEntity);
 
-        EmployerResponseDto savedResponseDto = employerMapper.employerToResponse(savedEmployerEntity);
+        EmployerResponseDto savedResponseDto = employerMapper.toResponseDto(savedEmployerEntity);
 
         return savedResponseDto;
     }
@@ -78,14 +78,14 @@ public class UserServiceImpl implements UserService {
     public ApplicantResponseDto registerApplicant(ApplicantDto applicantDto) {
         String hashedPassword = passwordEncoder.encode(applicantDto.getPassword());
 
-        ApplicantEntity applicantEntity = applicantMapper.applicantDtoToApplicant(applicantDto);
+        ApplicantEntity applicantEntity = applicantMapper.toEntity(applicantDto);
 
         applicantEntity.setPassword(hashedPassword);
         applicantEntity.setRole(Role.APPLICANT);
 
         ApplicantEntity savedApplicantEntity = applicantRepository.save(applicantEntity);
 
-        ApplicantResponseDto savedResponseDto = applicantMapper.applicantToResponse(savedApplicantEntity);
+        ApplicantResponseDto savedResponseDto = applicantMapper.toResponseDto(savedApplicantEntity);
 
         return savedResponseDto;
     }

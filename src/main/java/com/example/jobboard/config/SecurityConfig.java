@@ -85,6 +85,8 @@ public class SecurityConfig {
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/jobs").hasRole("EMPLOYER")
                         .requestMatchers(HttpMethod.GET, "/jobs").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/applications").hasRole("APPLICANT")
+                        .requestMatchers(HttpMethod.GET, "/applications").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

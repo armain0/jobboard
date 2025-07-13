@@ -5,13 +5,13 @@ import com.example.jobboard.domain.entities.JobEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {EmployerMapper.class, CompanyMapper.class})
+@Mapper(componentModel = "spring", uses = EmployerMapper.class)
 public interface JobMapper {
 
     @Mapping(target = "applications", ignore = true)
     @Mapping(target = "id", ignore = true)
-    JobEntity jobDtoToJob(JobDto jobDto);
+    JobEntity toEntity(JobDto jobDto);
 
-    JobDto jobToJobDto(JobEntity jobEntity);
+    JobDto toDto(JobEntity jobEntity);
 
 }
