@@ -1,5 +1,6 @@
 package com.example.jobboard.services;
 
+import com.example.jobboard.domain.ApplicationStatus;
 import com.example.jobboard.domain.dto.ApplicationDto;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface ApplicationService {
 
     List<ApplicationDto> getApplicationsAsEmployer(String name);
 
+    ApplicationDto finalizeApplication(Long id, String username, ApplicationStatus status);
 }

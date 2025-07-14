@@ -98,4 +98,31 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .map(applicationMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public ApplicationDto finalizeApplication(Long id, String username, ApplicationStatus status) {
+        if (!status.equals(ApplicationStatus.ACCEPTED) && !status.equals(ApplicationStatus.REJECTED)) {
+            return null;
+        }
+
+        Optional<ApplicationEntity> applicationOptional = applicationRepository.findById(id);
+
+        if (applicationOptional.isEmpty()) {
+            return null;
+        }
+
+        ApplicationEntity application = applicationOptional.get();
+
+        if (application.getJob().getEmployer() == null ||
+                !application.getJob().getEmployer().getUsername().equals(username)) {
+            return null;
+        }
+
+        application.setStatus(status);
+
+        ApplicationEntity savedApplication = applicationRepository.save(application);
+
+        return applicationMapper.toDto(savedApplication);
+    }
+
 }

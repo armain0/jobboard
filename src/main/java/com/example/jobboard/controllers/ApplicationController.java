@@ -1,15 +1,13 @@
 package com.example.jobboard.controllers;
 
+import com.example.jobboard.domain.ApplicationStatus;
 import com.example.jobboard.domain.dto.ApplicationDto;
 import com.example.jobboard.services.ApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +72,26 @@ public class ApplicationController {
         }
 
         return new ResponseEntity<>(Collections.emptyList(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @PatchMapping("/applications/finalize/{id}")
+    public ResponseEntity<ApplicationDto> finalizeApplication(@PathVariable Long id, Authentication authentication,
+                                                              @RequestBody Map<String, ApplicationStatus> statusBody) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = authentication.getName();
+
+        ApplicationStatus status = statusBody.get("status");
+
+        ApplicationDto finalizedApplication = applicationService.finalizeApplication(id, username, status);
+
+        if (finalizedApplication != null) {
+            return ResponseEntity.ok(finalizedApplication);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

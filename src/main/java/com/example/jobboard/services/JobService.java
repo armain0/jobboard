@@ -10,4 +10,6 @@ public interface JobService {
     List<JobDto> getAllJobsAsEmployer(String name);
 
     JobDto saveJob(String employerUsername, JobDto job);
+
+    JobDto closeJob(Long jobId, String username);
 }

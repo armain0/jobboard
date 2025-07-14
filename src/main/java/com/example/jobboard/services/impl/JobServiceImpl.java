@@ -74,4 +74,24 @@ public class JobServiceImpl implements JobService {
 
         return jobMapper.toDto(savedJob);
     }
+
+    @Override
+    public JobDto closeJob(Long jobId, String username) {
+        Optional<JobEntity> jobOptional = jobRepository.findById(jobId);
+
+        if (jobOptional.isEmpty()) {
+            return null;
+        }
+
+        JobEntity jobEntity = jobOptional.get();
+
+        if (jobEntity.getEmployer() == null || !jobEntity.getEmployer().getUsername().equals(username)) {
+            return null;
+        }
+
+        jobEntity.setStatus(JobStatus.CLOSED);
+        JobEntity updatedJobEntity = jobRepository.save(jobEntity);
+
+        return jobMapper.toDto(updatedJobEntity);
+    }
 }

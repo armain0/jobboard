@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +62,23 @@ public class JobController {
         }
 
         return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @PatchMapping("/jobs/close/{id}")
+    public ResponseEntity<JobDto> closeJob(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = authentication.getName();
+
+        JobDto closedJob = jobService.closeJob(id, username);
+
+        if (closedJob != null) {
+            return ResponseEntity.ok(closedJob);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
