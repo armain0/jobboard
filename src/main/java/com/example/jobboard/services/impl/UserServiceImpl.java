@@ -1,10 +1,13 @@
 package com.example.jobboard.services.impl;
 
 import com.example.jobboard.domain.Role;
-import com.example.jobboard.domain.dto.*;
+import com.example.jobboard.domain.dto.ApplicantDto;
+import com.example.jobboard.domain.dto.CompanyDto;
+import com.example.jobboard.domain.dto.EmployerDto;
 import com.example.jobboard.domain.entities.ApplicantEntity;
 import com.example.jobboard.domain.entities.CompanyEntity;
 import com.example.jobboard.domain.entities.EmployerEntity;
+import com.example.jobboard.exceptions.UsernameAlreadyExistsException;
 import com.example.jobboard.mappers.ApplicantMapper;
 import com.example.jobboard.mappers.CompanyMapper;
 import com.example.jobboard.mappers.EmployerMapper;
@@ -44,7 +47,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public EmployerResponseDto registerEmployer(EmployerDto employerDto) {
+    public EmployerDto registerEmployer(EmployerDto employerDto) {
+        if (employerRepository.findByUsername(employerDto.getUsername()).isPresent()) {
+            throw new UsernameAlreadyExistsException("Username '" + employerDto.getUsername() + "' is already taken.");
+        }
+
         CompanyDto companyDto = employerDto.getCompany();
 
         Optional<CompanyEntity> newCompany = companyRepository.findByName(companyDto.getName());
@@ -69,13 +76,19 @@ public class UserServiceImpl implements UserService {
 
         EmployerEntity savedEmployerEntity = employerRepository.save(employerEntity);
 
-        EmployerResponseDto savedResponseDto = employerMapper.toResponseDto(savedEmployerEntity);
+        EmployerDto savedResponseDto = employerMapper.toDto(savedEmployerEntity);
+        savedResponseDto.setPassword(null);
 
         return savedResponseDto;
     }
 
     @Override
-    public ApplicantResponseDto registerApplicant(ApplicantDto applicantDto) {
+    @Transactional
+    public ApplicantDto registerApplicant(ApplicantDto applicantDto) {
+        if (applicantRepository.findByUsername(applicantDto.getUsername()).isPresent()) {
+            throw new UsernameAlreadyExistsException("Username '" + applicantDto.getUsername() + "' is already taken.");
+        }
+
         String hashedPassword = passwordEncoder.encode(applicantDto.getPassword());
 
         ApplicantEntity applicantEntity = applicantMapper.toEntity(applicantDto);
@@ -85,7 +98,8 @@ public class UserServiceImpl implements UserService {
 
         ApplicantEntity savedApplicantEntity = applicantRepository.save(applicantEntity);
 
-        ApplicantResponseDto savedResponseDto = applicantMapper.toResponseDto(savedApplicantEntity);
+        ApplicantDto savedResponseDto = applicantMapper.toDto(savedApplicantEntity);
+        savedResponseDto.setPassword(null);
 
         return savedResponseDto;
     }

@@ -6,18 +6,19 @@ import com.example.jobboard.domain.entities.ApplicantEntity;
 import com.example.jobboard.domain.entities.ApplicationEntity;
 import com.example.jobboard.domain.entities.EmployerEntity;
 import com.example.jobboard.domain.entities.JobEntity;
+import com.example.jobboard.exceptions.ResourceNotFoundException;
 import com.example.jobboard.mappers.ApplicationMapper;
 import com.example.jobboard.repositories.ApplicantRepository;
 import com.example.jobboard.repositories.ApplicationRepository;
 import com.example.jobboard.repositories.EmployerRepository;
 import com.example.jobboard.repositories.JobRepository;
 import com.example.jobboard.services.ApplicationService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -40,38 +41,35 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public ApplicationDto apply(String username, Long jobId) {
-        Optional<ApplicantEntity> applicant = applicantRepository.findByUsername(username);
+        ApplicantEntity applicant = applicantRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Applicant with username '" +
+                        username + "' not found."));
 
-        Optional<JobEntity> job = jobRepository.findById(jobId);
 
-        if (applicant.isPresent() && job.isPresent()) {
-            ApplicationEntity application = ApplicationEntity.builder()
-                    .applicant(applicant.get())
-                    .job(job.get())
-                    .applicationDate(LocalDateTime.now())
-                    .status(ApplicationStatus.PENDING)
-                    .build();
+        JobEntity job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id '" +
+                        jobId + "' not found."));
 
-            ApplicationEntity savedApplication = applicationRepository.save(application);
+        ApplicationEntity application = ApplicationEntity.builder()
+                .applicant(applicant)
+                .job(job)
+                .applicationDate(LocalDateTime.now())
+                .status(ApplicationStatus.PENDING)
+                .build();
 
-            ApplicationDto savedApplicationDto = applicationMapper.toDto(savedApplication);
+        ApplicationEntity savedApplication = applicationRepository.save(application);
 
-            return savedApplicationDto;
-        }
-
-        return null;
+        return applicationMapper.toDto(savedApplication);
     }
 
     @Override
     public List<ApplicationDto> getApplications(String username) {
-        Optional<ApplicantEntity> applicant = applicantRepository.findByUsername(username);
-
-        if (applicant.isEmpty()) {
-            return Collections.emptyList();
-        }
+        ApplicantEntity applicant = applicantRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Applicant with username '" +
+                        username + "' not found."));
 
         List<ApplicationEntity> applicationEntities = applicationRepository
-                .findByApplicant(applicant.get());
+                .findByApplicant(applicant);
 
         return applicationEntities.stream()
                 .map(applicationMapper::toDto)
@@ -80,13 +78,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<ApplicationDto> getApplicationsAsEmployer(String username) {
-        Optional<EmployerEntity> employer = employerRepository.findByUsername(username);
+        EmployerEntity employer = employerRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Employer with username '" +
+                        username + "' not found."));
 
-        if (employer.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<JobEntity> jobList = jobRepository.findByEmployer(employer.get());
+        List<JobEntity> jobList = jobRepository.findByEmployer(employer);
 
         if (jobList.isEmpty()) {
             return Collections.emptyList();
@@ -102,20 +98,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApplicationDto finalizeApplication(Long id, String username, ApplicationStatus status) {
         if (!status.equals(ApplicationStatus.ACCEPTED) && !status.equals(ApplicationStatus.REJECTED)) {
-            return null;
+            throw new IllegalArgumentException("Invalid application status." +
+                    " Only ACCEPTED or REJECTED are allowed for finalization.");
         }
 
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findById(id);
-
-        if (applicationOptional.isEmpty()) {
-            return null;
-        }
-
-        ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Application with id '" +
+                        id + "' not found."));
 
         if (application.getJob().getEmployer() == null ||
                 !application.getJob().getEmployer().getUsername().equals(username)) {
-            return null;
+            throw new AccessDeniedException("User '" + username + "' is not authorized to finalize" +
+                    " application with ID " + id + ".");
         }
 
         application.setStatus(status);

@@ -1,7 +1,9 @@
 package com.example.jobboard.controllers;
 
 import com.example.jobboard.domain.dto.JobDto;
+import com.example.jobboard.domain.dto.JobRequestDto;
 import com.example.jobboard.services.JobService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,11 +42,11 @@ public class JobController {
             }
         }
 
-        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/jobs")
-    private ResponseEntity<JobDto> postJob(Authentication authentication, @RequestBody JobDto job) {
+    private ResponseEntity<JobDto> postJob(Authentication authentication, @Valid @RequestBody JobRequestDto job) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -53,15 +55,13 @@ public class JobController {
             String authorityString = authority.getAuthority();
 
             if (authorityString.equals("ROLE_EMPLOYER")) {
-                JobDto savedJob = jobService.saveJob(authentication.getName(), job);
+                JobDto savedJob = jobService.saveJob(authentication.getName(), job.getTitle());
 
-                if (savedJob != null) {
-                    return new ResponseEntity<>(savedJob, HttpStatus.CREATED);
-                }
+                return new ResponseEntity<>(savedJob, HttpStatus.CREATED);
             }
         }
 
-        return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @PatchMapping("/jobs/close/{id}")
@@ -74,11 +74,7 @@ public class JobController {
 
         JobDto closedJob = jobService.closeJob(id, username);
 
-        if (closedJob != null) {
-            return ResponseEntity.ok(closedJob);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(closedJob);
     }
 
 }

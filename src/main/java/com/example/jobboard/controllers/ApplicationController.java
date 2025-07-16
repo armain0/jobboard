@@ -2,6 +2,7 @@ package com.example.jobboard.controllers;
 
 import com.example.jobboard.domain.ApplicationStatus;
 import com.example.jobboard.domain.dto.ApplicationDto;
+import com.example.jobboard.domain.dto.ApplicationRequestDto;
 import com.example.jobboard.services.ApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class ApplicationController {
 
     @PostMapping("/applications")
     public ResponseEntity<ApplicationDto> postApplication(Authentication authentication,
-                                                          @RequestBody Map<String, Long> reqBody) {
+                                                          @RequestBody ApplicationRequestDto application) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -33,17 +34,16 @@ public class ApplicationController {
             String authorityString = authority.getAuthority();
 
             if (authorityString.equals("ROLE_APPLICANT")) {
-                Long jobId = reqBody.get("id");
+                ApplicationDto savedApplication = applicationService.apply(
+                        authentication.getName(),
+                        application.getId()
+                );
 
-                ApplicationDto savedApplication = applicationService.apply(authentication.getName(), jobId);
-
-                if (savedApplication != null) {
-                    return new ResponseEntity<>(savedApplication, HttpStatus.CREATED);
-                }
+                return new ResponseEntity<>(savedApplication, HttpStatus.CREATED);
             }
         }
 
-        return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/applications")
@@ -58,20 +58,16 @@ public class ApplicationController {
             if (authorityString.equals("ROLE_APPLICANT")) {
                 List<ApplicationDto> applications = applicationService.getApplications(authentication.getName());
 
-                if (!applications.isEmpty()) {
-                    return new ResponseEntity<>(applications, HttpStatus.OK);
-                }
+                return new ResponseEntity<>(applications, HttpStatus.OK);
             } else if (authorityString.equals("ROLE_EMPLOYER")) {
                 List<ApplicationDto> applications = applicationService
                         .getApplicationsAsEmployer(authentication.getName());
 
-                if (!applications.isEmpty()) {
-                    return new ResponseEntity<>(applications, HttpStatus.OK);
-                }
+                return new ResponseEntity<>(applications, HttpStatus.OK);
             }
         }
 
-        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.FORBIDDEN);
     }
 
     @PatchMapping("/applications/finalize/{id}")
@@ -87,11 +83,7 @@ public class ApplicationController {
 
         ApplicationDto finalizedApplication = applicationService.finalizeApplication(id, username, status);
 
-        if (finalizedApplication != null) {
-            return ResponseEntity.ok(finalizedApplication);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(finalizedApplication);
     }
 
 }

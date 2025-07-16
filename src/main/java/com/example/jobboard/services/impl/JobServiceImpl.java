@@ -4,15 +4,15 @@ import com.example.jobboard.domain.JobStatus;
 import com.example.jobboard.domain.dto.JobDto;
 import com.example.jobboard.domain.entities.EmployerEntity;
 import com.example.jobboard.domain.entities.JobEntity;
+import com.example.jobboard.exceptions.ResourceNotFoundException;
 import com.example.jobboard.mappers.JobMapper;
 import com.example.jobboard.repositories.EmployerRepository;
 import com.example.jobboard.repositories.JobRepository;
 import com.example.jobboard.services.JobService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -43,14 +43,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobDto> getAllJobsAsEmployer(String username) {
-        Optional<EmployerEntity> employer = employerRepository.findByUsername(username);
-
-        if (employer.isEmpty()) {
-            return Collections.emptyList();
-        }
+        EmployerEntity employer = employerRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employer with username '" + username + "' not found."));
 
         List<JobEntity> jobEntities = jobRepository
-                .findByEmployer(employer.orElse(null));
+                .findByEmployer(employer);
 
         return jobEntities.stream()
                 .map(jobMapper::toDto)
@@ -58,17 +56,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobDto saveJob(String employerUsername, JobDto jobDto) {
-        Optional<EmployerEntity> employer = employerRepository.findByUsername(employerUsername);
+    public JobDto saveJob(String employerUsername, String title) {
+        EmployerEntity employer = employerRepository.findByUsername(employerUsername)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employer with username '" + employerUsername + "' not found."));
 
-        if (employer.isEmpty()) {
-            return null;
-        }
-
-        JobEntity job = new JobEntity();
-        job.setEmployer(employer.get());
-        job.setStatus(JobStatus.OPEN);
-        job.setTitle(jobDto.getTitle());
+        JobEntity job = JobEntity.builder()
+                .employer(employer)
+                .status(JobStatus.OPEN)
+                .title(title).build();
 
         JobEntity savedJob = jobRepository.save(job);
 
@@ -77,16 +73,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobDto closeJob(Long jobId, String username) {
-        Optional<JobEntity> jobOptional = jobRepository.findById(jobId);
-
-        if (jobOptional.isEmpty()) {
-            return null;
-        }
-
-        JobEntity jobEntity = jobOptional.get();
+        JobEntity jobEntity = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Id " + jobId + " not found."));
 
         if (jobEntity.getEmployer() == null || !jobEntity.getEmployer().getUsername().equals(username)) {
-            return null;
+            throw new AccessDeniedException("User '" + username + "' is not authorized to close job with ID " + jobId + ".");
         }
 
         jobEntity.setStatus(JobStatus.CLOSED);

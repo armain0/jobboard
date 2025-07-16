@@ -1,6 +1,6 @@
 package com.example.jobboard.domain.dto;
 
-import com.example.jobboard.domain.Role;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,16 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ApplicantResponseDto {
+public class ApplicationRequestDto {
 
-    private String name;
-
-    private String username;
-
-    private Integer age;
-
-    private Role role;
-
-    private String resume;
+    @NotNull(message = "Id is required.")
+    private Long id;
 
 }
