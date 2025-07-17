@@ -25,22 +25,22 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping(value = "/register/employer")//, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployerDto> RegisterEmployer(@Valid @RequestBody EmployerDto employerDto) {
+    @PostMapping(value = "/register/employer")
+    public ResponseEntity<EmployerDto> registerEmployer(@Valid @RequestBody EmployerDto employerDto) {
         EmployerDto employerResponseDto = userService.registerEmployer(employerDto);
 
         return new ResponseEntity<>(employerResponseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/register/applicant")//, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApplicantDto> RegisterApplicant(@Valid @RequestBody ApplicantDto applicantDto) {
+    @PostMapping(value = "/register/applicant")
+    public ResponseEntity<ApplicantDto> registerApplicant(@Valid @RequestBody ApplicantDto applicantDto) {
         ApplicantDto applicantResponseDto = userService.registerApplicant(applicantDto);
 
         return new ResponseEntity<>(applicantResponseDto, HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponseDto> LoginUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> loginUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         try {
             LoginResponseDto user = authService.authenticateUser(loginRequestDto);
 

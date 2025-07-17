@@ -44,9 +44,9 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
 
         errors.put("message", ex.getMessage());
-        errors.put("status", String.valueOf(HttpStatus.CONFLICT.value()));
+        errors.put("status", String.valueOf(HttpStatus.NOT_FOUND.value()));
 
-        return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
