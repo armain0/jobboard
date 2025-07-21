@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ApplicationDto {
 
+    private Long id;
+
     private ApplicantDto applicant;
 
     private JobDto job;
