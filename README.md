@@ -1,6 +1,6 @@
-## Spring Boot Job Board API
+## Job Board API
 
-A RESTful backend API for a job board application, enabling employers to post and manage job listings, and applicants to browse and apply for jobs. It includes user authentication and role-based access control.
+A backend API for a job board application, enabling employers to post and manage job listings, and applicants to browse and apply for jobs. It includes user authentication and role-based access control.
 
 ## Features
 
